@@ -3,12 +3,14 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import './index.css';
 import LandingPage from './pages/LandingPage/LandingPage';
+import PlanningPage from './pages/PlanningPage/PlanningPage';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<LandingPage />} />
+        <Route path='planning' element={<PlanningPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>
