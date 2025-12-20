@@ -5,7 +5,7 @@ import cat from '/cat.png';
 export default function LandingPage() {
   return (
     <div className={styles.container}>
-      <img src={cat} width={400} />
+      <img src={cat} />
       <Link to='/planning'>
         <button className={styles.button}>Let's Begin</button>
       </Link>
