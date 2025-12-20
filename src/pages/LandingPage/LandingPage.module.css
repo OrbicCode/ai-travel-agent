@@ -25,5 +25,5 @@
 
 .button:hover,
 .button:focus {
-  background: rgba(75, 220, 176, 0.75);
+  background: rgba(75, 220, 176, 0.6);
 }
