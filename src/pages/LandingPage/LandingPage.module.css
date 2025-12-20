@@ -31,6 +31,6 @@
 }
 
 .button:hover {
-  background: rgba(75, 220, 176, 0.6);
+  background: rgba(75, 220, 176, 0.3);
   border: 4px solid var(--green);
 }
