@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import PassengerCounter from '../../components/PassengerCounter/PassengerCounter';
+import TravellerCounter from '../../components/TravellerCounter/TravellerCounter';
 
 export default function PlanningPage() {
-  const [passengers, setPassengers] = useState<number>(0);
+  const [travellers, setTravellers] = useState<number>(0);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
   }
   return (
     <form onSubmit={handleSubmit}>
-      <PassengerCounter passengers={passengers} onChange={setPassengers} />
+      <TravellerCounter travellers={travellers} onChange={setTravellers} />
       <button>Plan My Trip!</button>
     </form>
   );
