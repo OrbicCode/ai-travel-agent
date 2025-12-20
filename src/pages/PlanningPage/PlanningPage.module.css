@@ -1,15 +1,15 @@
-.destinationsContainer {
+.inputGroupContainer {
   display: flex;
   flex-direction: column;
-  gap: 1em;
-  margin-top: 2em;
+  gap: 0.5em;
+  margin-block: 1.5em;
 }
 
 .inputContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.4em;
 }
 
 .inputContainer label {
@@ -24,7 +24,7 @@
   text-align: center;
   background: none;
   width: 100%;
-  padding: 0.5em;
+  padding: 0.4em;
   border: 4px solid black;
   border-radius: 40px;
 }
@@ -46,7 +46,7 @@
   font-weight: 700;
   background: var(--green);
   width: 100%;
-  margin-top: 2em;
+  margin-top: 1em;
   padding: 0.5em;
   border: 4px solid black;
   border-radius: 40px;
