@@ -2,7 +2,29 @@
   box-sizing: border-box;
 }
 
+:root {
+  --off-white: #f2ffff;
+  --green: #4bdcb0; /* rgb(75, 220, 176) */
+  --teal: #bbf7f7;
+}
+
+#root {
+  height: 100%;
+}
+
+html {
+  background-color: #023b4d;
+}
+
 body {
-  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  background: var(--off-white);
   height: 100vh;
+  width: 400px;
+  margin: 0 auto;
+}
+
+button {
+  cursor: pointer;
 }
