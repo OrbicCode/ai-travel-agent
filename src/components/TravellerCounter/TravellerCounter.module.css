@@ -20,6 +20,11 @@
   border-radius: 40px;
 }
 
+.counter:hover,
+.counter:focus {
+  border: 4px solid var(--green);
+}
+
 .counter button {
   display: flex;
   justify-content: center;
@@ -33,6 +38,10 @@
   height: 40px;
   border: none;
   border-radius: 50px;
+}
+
+.counter button:hover {
+  background-color: var(--green);
 }
 
 .counter span {
