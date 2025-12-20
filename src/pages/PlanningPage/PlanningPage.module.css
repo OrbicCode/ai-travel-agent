@@ -1,0 +1,58 @@
+.destinationsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-top: 2em;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.inputContainer label {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.input {
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  background: none;
+  width: 100%;
+  padding: 0.5em;
+  border: 4px solid black;
+  border-radius: 40px;
+}
+
+.input::placeholder {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.input:hover,
+.input:focus {
+  outline: none;
+  border: 4px solid var(--green);
+}
+
+.button {
+  display: block;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--green);
+  width: 100%;
+  margin-top: 2em;
+  padding: 0.5em;
+  border: 4px solid black;
+  border-radius: 40px;
+}
+
+.button:hover {
+  background: rgba(75, 220, 176, 0.3);
+  border: 4px solid var(--green);
+}
