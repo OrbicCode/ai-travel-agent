@@ -8,15 +8,16 @@
   --teal: #bbf7f7;
 }
 
-#root {
-  height: 100%;
-}
-
 html {
   background-color: #023b4d;
 }
 
 body {
+  margin: 0;
+}
+
+#root {
+  height: 100%;
   font-family: 'Inter', sans-serif;
   font-size: 1rem;
   background: var(--off-white);
@@ -26,6 +27,7 @@ body {
   padding: 1em;
   border: 4px solid black;
   border-radius: 25px;
+  overflow-y: scroll;
 }
 
 button {
@@ -35,4 +37,9 @@ button {
 h1,
 h2 {
   margin: 0;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3rem;
 }
