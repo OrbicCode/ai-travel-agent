@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
+import openai from '../../lib/config';
+import { tools } from '../../lib/tools';
 import TravellerCounter from '../../components/TravellerCounter/TravellerCounter';
 import styles from './PlanningPage.module.css';
+import { getWeather } from '../../lib/tools';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 export default function PlanningPage() {
   const [travellers, setTravellers] = useState<number>(0);
@@ -10,6 +15,8 @@ export default function PlanningPage() {
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
   const [budget, setBudget] = useState<string>('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     function getCurrentDate() {
@@ -41,8 +48,70 @@ export default function PlanningPage() {
     setBudget(e.target.value);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const messages: ChatCompletionMessageParam[] = [
+      {
+        role: 'system',
+        content:
+          'You are a helpful feline travel agent. You are going to get the users travel location and You will then you will give the temperature with the approriate unit of the location provided.',
+      },
+      {
+        role: 'user',
+        content: `Flying to: ${flyingTo}`,
+      },
+    ];
+
+    navigate('/loading');
+
+    const MAX_ITERATIONS = 3;
+
+    for (let i = 0; i < MAX_ITERATIONS; i++) {
+      try {
+        const response = await openai.chat.completions.create({
+          model: 'gpt-5-nano',
+          messages,
+          tools,
+        });
+
+        const { message, finish_reason: finishReason } = response.choices[0];
+        const { tool_calls: toolCalls } = message;
+
+        messages.push(message);
+
+        if (finishReason === 'tool_calls' && toolCalls) {
+          for (const toolCall of toolCalls) {
+            const functionName = toolCall.function.name;
+            const functionArgs = JSON.parse(toolCall.function.arguments);
+
+            if (functionName === 'getWeather') {
+              const weatherResult = await getWeather(functionArgs.flightTo);
+              messages.push({
+                tool_call_id: toolCall.id,
+                role: 'tool',
+                name: functionName,
+                content: weatherResult,
+              });
+            }
+          }
+        } else {
+          const aiResponse = message.content;
+          const tripData = {
+            travellers,
+            flyingFrom,
+            flyingTo,
+            fromDate,
+            toDate,
+            budget,
+            aiResponse,
+          };
+          navigate('/summary', { state: tripData });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 
   return (
@@ -57,6 +126,7 @@ export default function PlanningPage() {
             onChange={handleFlyingFrom}
             value={flyingFrom}
             className={styles.input}
+            required
           />
         </div>
         <div className={styles.inputContainer}>
@@ -67,6 +137,7 @@ export default function PlanningPage() {
             onChange={handleFlyingTo}
             value={flyingTo}
             className={styles.input}
+            required
           />
         </div>
       </div>
@@ -81,6 +152,7 @@ export default function PlanningPage() {
             onChange={handleFromDate}
             value={fromDate}
             className={styles.input}
+            required
           />
         </div>
         <div className={styles.inputContainer}>
@@ -92,6 +164,7 @@ export default function PlanningPage() {
             onChange={handleToDate}
             value={toDate}
             className={styles.input}
+            required
           />
         </div>
       </div>
