@@ -7,7 +7,7 @@
 export async function getWeather(flightTo: string) {
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${flightTo}&appid=72981ed094d399cae0ff841f806f4508`
+      `https://api.openweathermap.org/data/2.5/weather?q=${flightTo}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}`
     );
     const data = await response.json();
     if (data) {
