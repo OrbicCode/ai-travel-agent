@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import openai from '../../lib/config';
-import { tools } from '../../lib/tools';
-import TravellerCounter from '../../components/TravellerCounter/TravellerCounter';
+import { getFlights, getHotels, tools } from '../../lib/tools';
+import TravelerCounter from '../../components/TravelerCounter/TravelerCounter';
 import styles from './PlanningPage.module.css';
 import { getWeather } from '../../lib/tools';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 export default function PlanningPage() {
-  const [travellers, setTravellers] = useState<number>(0);
+  const [travelers, settravelers] = useState<number>(1);
   const [flyingFrom, setFlyingFrom] = useState<string>('');
   const [flyingTo, setFlyingTo] = useState<string>('');
   const [currentDate, setCurrentDate] = useState<string | undefined>(undefined);
@@ -54,16 +54,34 @@ export default function PlanningPage() {
     const messages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        content:
-          'You are a helpful feline travel agent. You are going to get the users travel location and You will then you will give the temperature with the approriate unit of the location provided.',
+        content: `You are a helpful feline travel agent who likes to end every sentence with ", meow.".
+                  You will use functions to get the flying from, flying to, from date, to date and budget.
+                  You will then craft one sentence responses in JSON format about the weather, flights and hotels.
+                  Make sure that when I pull the content from the message that I can run the command JSON.parse() on my end.
+
+                  JSON format (with example responses): {
+                    weather: 'You can expect the weather to be foggy. Low will be 30ºC/F and high will be 35ºC/F, meow.',
+                    flights: 'The best option for you is with Delta Airlines with a layover in Oslo, meow.',
+                    hotels: 'We recommend you stay at the Premiere Inn hotel in central Paris, meow.'
+                  }
+                  
+                  Just stick to one sentence answers. Do not ask for extra details in your responses.
+        `,
       },
       {
         role: 'user',
-        content: `Flying to: ${flyingTo}`,
+        content: `
+          Travelers: ${travelers}
+          Flying From: ${flyingFrom},
+          Flying To: ${flyingTo},
+          From Date: ${fromDate},
+          To Date: ${toDate},
+          Budget: £ ${budget}
+        `,
       },
     ];
 
-    navigate('/loading');
+    navigate('/loading', { replace: true });
 
     const MAX_ITERATIONS = 3;
 
@@ -78,6 +96,7 @@ export default function PlanningPage() {
         const { message, finish_reason: finishReason } = response.choices[0];
         const { tool_calls: toolCalls } = message;
 
+        console.log(`Message: ${message}`);
         messages.push(message);
 
         if (finishReason === 'tool_calls' && toolCalls) {
@@ -85,8 +104,10 @@ export default function PlanningPage() {
             const functionName = toolCall.function.name;
             const functionArgs = JSON.parse(toolCall.function.arguments);
 
+            console.log(`ToolCall: ${toolCall}`);
+
             if (functionName === 'getWeather') {
-              const weatherResult = await getWeather(functionArgs.flightTo);
+              const weatherResult = await getWeather(functionArgs.flyingTo);
               messages.push({
                 tool_call_id: toolCall.id,
                 role: 'tool',
@@ -94,11 +115,36 @@ export default function PlanningPage() {
                 content: weatherResult,
               });
             }
+            if (functionName === 'getFlights') {
+              const flightsResult = await getFlights(
+                functionArgs.travelers,
+                functionArgs.flyingFrom,
+                functionArgs.flyingTo
+              );
+              messages.push({
+                tool_call_id: toolCall.id,
+                role: 'tool',
+                name: functionName,
+                content: flightsResult,
+              });
+            }
+            if (functionName === 'getHotels') {
+              const hootelsResult = await getHotels(functionArgs.travelers, functionArgs.flyingTo);
+              messages.push({
+                tool_call_id: toolCall.id,
+                role: 'tool',
+                name: functionName,
+                content: hootelsResult,
+              });
+            }
           }
         } else {
           const aiResponse = message.content;
+          if (aiResponse) {
+            console.log(JSON.parse(aiResponse));
+          }
           const tripData = {
-            travellers,
+            travelers,
             flyingFrom,
             flyingTo,
             fromDate,
@@ -116,7 +162,7 @@ export default function PlanningPage() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <TravellerCounter travellers={travellers} onChange={setTravellers} />
+      <TravelerCounter travelers={travelers} onChange={settravelers} />
       <div className={styles.inputGroupContainer}>
         <div className={styles.inputContainer}>
           <label>Flying from</label>
