@@ -18,9 +18,13 @@ export default function TravellerCounter({ travellers, onChange }: TravellerCoun
     <div className={styles.container}>
       <label>Number of travellers</label>
       <div className={styles.counter}>
-        <button onClick={decrement}>-</button>
+        <button type='button' onClick={decrement}>
+          -
+        </button>
         <span>{travellers}</span>
-        <button onClick={increment}>+</button>
+        <button type='button' onClick={increment}>
+          +
+        </button>
       </div>
     </div>
   );
