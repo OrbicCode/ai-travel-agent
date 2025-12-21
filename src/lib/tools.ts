@@ -1,13 +1,9 @@
-// type Weather = {
-//   description: string;
-//   tempMinKelvin: number;
-//   tempMaxKelvin: number;
-// };
+import openai from './config';
 
-export async function getWeather(flightTo: string) {
+export async function getWeather(flyingTo: string) {
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${flightTo}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}`
+      `https://api.openweathermap.org/data/2.5/weather?q=${flyingTo}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}`
     );
     const data = await response.json();
     if (data) {
@@ -24,13 +20,77 @@ export async function getWeather(flightTo: string) {
   }
 }
 
-// export async function getFlights(travellers, flightFrom, flightTo) {}
+export async function getFlights(travelers: number, flyingFrom: string, flyingTo: string) {
+  console.log(
+    `getFlights Args: Travellers ${travelers}, flyingFrom: ${flyingFrom}, flyingTo: ${flyingTo}`
+  );
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-5-nano',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a helpful travel agent.
+          You will be given the number of travelers, where they are flying from and where they are flying to.
 
-// export async function getHotel(travellers, flightTo) {}
+          Craft a one sentence response recommending the best flight option for them.
+
+          Example: The best option for you is with Delta Airlines with a layover in Oslo.
+        `,
+        },
+        {
+          role: 'user',
+          content: `
+          Travelers: ${travelers},
+          Flying From: ${flyingFrom}
+          Flying to: ${flyingTo}
+        `,
+        },
+      ],
+    });
+    console.log(`getFlights Response: ${response.choices[0].message.content}`);
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getHotels(travelers: number, flyingTo: string) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-5-nano',
+      messages: [
+        {
+          role: 'system',
+          content: `You are a helpful travel agent.
+          You will be given the number of travelers and where they are flying to.
+
+          Craft a one sentence response recommending the best Hotel option for them.
+
+          Example: We recommend you stay at the Premiere Inn hotel in central Paris.
+        `,
+        },
+        {
+          role: 'user',
+          content: `
+          Travelers: ${travelers},
+          Flying to: ${flyingTo}
+        `,
+        },
+      ],
+    });
+    console.log(`getHotels Response: ${response.choices[0].message.content}`);
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
 
 export const tools = [
   {
-    type: 'function' as const,
+    type: 'function',
     function: {
       name: 'getWeather',
       description:
@@ -38,12 +98,58 @@ export const tools = [
       parameters: {
         type: 'object',
         properties: {
-          flightTo: {
+          flyingTo: {
             type: 'string',
-            description: 'The destination, where the travellers are flying to.',
+            description: 'The destination, where the travelers are flying to.',
           },
         },
-        required: ['flightTo'],
+        required: ['flyingTo'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'getFlights',
+      description: 'An api call to get a flight recommendation',
+      parameters: {
+        type: 'object',
+        properties: {
+          travelers: {
+            type: 'string',
+            description: 'The number of travelers.',
+          },
+          flyingFrom: {
+            type: 'string',
+            description: 'The destination, where the travelers are flying from.',
+          },
+          flyingTo: {
+            type: 'string',
+            description: 'The destination, where the travelers are flying to.',
+          },
+        },
+        required: ['travelers', 'flyingFrom', 'flyingTo'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'getHotels',
+      description: 'An api call to get a Hotel recommendation',
+      parameters: {
+        type: 'object',
+        properties: {
+          travelers: {
+            type: 'string',
+            description: 'The number of travelers.',
+          },
+          flyingTo: {
+            type: 'string',
+            description: 'The destination, where the travelers are flying to.',
+          },
+        },
+        required: ['travelers', 'flyingTo'],
       },
     },
   },
